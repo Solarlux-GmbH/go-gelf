@@ -86,6 +86,17 @@ const (
 	LOG_DEBUG   = int32(7)
 )
 
+var DefaultMessage = Message{
+	Version:  "1.0",
+	Host:     "",
+	Short:    "",
+	Full:     "",
+	TimeUnix: 0.0,
+	Level:    6, // info
+	Facility: "",
+	Extra:    map[string]interface{}{},
+}
+
 // numChunks returns the number of GELF chunks necessary to transmit
 // the given compressed buffer.
 func numChunks(b []byte) int {
@@ -324,18 +335,16 @@ func (w *Writer) Write(p []byte) (n int, err error) {
 		full = p
 	}
 
-	m := Message{
-		Version:  "1.1",
-		Host:     w.hostname,
-		Short:    string(short),
-		Full:     string(full),
-		TimeUnix: float64(time.Now().Unix()),
-		Level:    6, // info
-		Facility: w.Facility,
-		Extra: map[string]interface{}{
-			"_file": file,
-			"_line": line,
-		},
+	m := &DefaultMessage
+
+	*m.Host = w.hostname
+	*m.Short = string(short)
+	*m.Full = string(full)
+	*m.TimeUnix = float64(time.Now().Unix())
+	*m.Facility = w.Facility
+	*m.Extra = map[string]interface{}{
+		"_file": file,
+		"_line": line,
 	}
 
 	if err = w.WriteMessage(&m); err != nil {
