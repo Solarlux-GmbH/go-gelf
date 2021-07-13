@@ -337,17 +337,17 @@ func (w *Writer) Write(p []byte) (n int, err error) {
 
 	m := &DefaultMessage
 
-	*m.Host = w.hostname
-	*m.Short = string(short)
-	*m.Full = string(full)
-	*m.TimeUnix = float64(time.Now().Unix())
-	*m.Facility = w.Facility
-	*m.Extra = map[string]interface{}{
+	m.Host = w.hostname
+	m.Short = string(short)
+	m.Full = string(full)
+	m.TimeUnix = float64(time.Now().Unix())
+	m.Facility = w.Facility
+	m.Extra = map[string]interface{}{
 		"_file": file,
 		"_line": line,
 	}
 
-	if err = w.WriteMessage(&m); err != nil {
+	if err = w.WriteMessage(m); err != nil {
 		return 0, err
 	}
 
